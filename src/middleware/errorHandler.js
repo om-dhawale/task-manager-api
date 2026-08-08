@@ -1,7 +1,12 @@
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, next){
   console.error(err);
+  if (err.code === 'P2002') {
+  const field = err.meta?.target?.[0] || 'field';
+  return res.status(409).json({ error: `${field} already in use` });
+} 
   res.status(500).json({ error: 'Something went wrong' });
+
 };
 
 module.exports = errorHandler;
