@@ -4,6 +4,7 @@ const router = express.Router();
 const prisma = require('../prismaClient');
 const asyncHandler = require('../middleware/asyncHandler');
 const { createProjectSchema } = require("../schemas/project.schema");
+const projectOwnership = require('../middleware/projectOwnership')
 
 //CREATE
 router.post("/", asyncHandler(async (req, res) => {
@@ -15,6 +16,7 @@ router.post("/", asyncHandler(async (req, res) => {
   const project = await prisma.project.create({
     data: {
       name,
+      userId: req.user.userId   
     },
   });
   res.status(201).json(project);
@@ -22,7 +24,9 @@ router.post("/", asyncHandler(async (req, res) => {
 
 // READ ALL
 router.get("/", asyncHandler(async (req, res) => {
-  const projects = await prisma.project.findMany();
+  const projects = await prisma.project.findMany({
+    where: {userId: req.user.userId}
+  });
   res.json(projects);
 }));
 
