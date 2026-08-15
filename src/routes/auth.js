@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const prisma = require('../prismaClient');
 const {registerUserSchema, loginUserSchema} = require('../schemas/auth.schema');
 const asyncHandler = require('../middleware/asyncHandler');
+const loginLimiter = require('../middleware/rateLimiter');
 
 router.post('/signup',asyncHandler(async (req, res) => {
     const result = registerUserSchema.safeParse(req.body);
@@ -26,7 +27,7 @@ router.post('/signup',asyncHandler(async (req, res) => {
   })
 );
 
-router.post('/login', asyncHandler( async (req, res) => {
+router.post('/login', loginLimiter, asyncHandler( async (req, res) => {
 
     const result = loginUserSchema.safeParse(req.body);
     if(!result.success){
