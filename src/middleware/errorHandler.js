@@ -1,6 +1,10 @@
+const logger = require('../utils/logger'); 
+
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, next) {
-  console.error(err);
+
+  logger.error(err.message, { stack: err.stack, path: req.path, method: req.method });
+
   if (err.code === 'P2002') {
     const field = err.meta?.target?.[0] || 'field';
     return res.status(409).json({ error: `${field} already in use` });

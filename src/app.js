@@ -7,11 +7,14 @@ const authenticate = require('./middleware/authenticate');
 const errorHandler = require('./middleware/errorHandler');
 const helmet = require('helmet');
 const cors = require('cors');
+const morgan = require('morgan');
+const logger = require('./utils/logger');
 
 const app = express();
 
 app.use(helmet());
 app.use(cors());
+app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim())}}))
 app.use(express.json());
 
 app.use('/auth', authRoutes);
