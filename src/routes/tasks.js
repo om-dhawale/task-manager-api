@@ -13,7 +13,7 @@ router.post('/', asyncHandler(async (req, res) => {
   }
   const project = await prisma.project.findUnique({
     where: {
-      id: result.data.id,
+      id: result.data.projectId,
       userId: req.user.userId
     }
   })
@@ -26,14 +26,47 @@ router.post('/', asyncHandler(async (req, res) => {
 }));
 
 router.get('/', asyncHandler(async (req, res) => {
-  const tasks = await prisma.task.findMany({
-    where: {
-      project: {
-        userId: req.user.userId
-      }
+
+  // Pagination
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
+  
+  const where = {
+    project: {
+      userId: req.user.userId,
     }
-  });
-  res.json(tasks);
+  }
+
+  if (req.query.completed !== undefined){
+    where.completed = req.query.completed === 'true'
+  }
+
+  if(req.query.search){
+    where.title = {
+      contains: req.query.search,
+      mode: 'insensitive'
+    }
+  }
+
+  const [tasks, totalCount] = await Promise.all([
+    prisma.task.findMany({
+      where,
+      skip,
+      take: limit,
+    }),
+    prisma.task.count({where})
+  ]) 
+
+  res.json({
+    data: tasks,
+    pagination: {
+      page,
+      limit,
+      totalCount,
+      totalPages: Math.ceil(totalCount/limit)
+    }
+  })
 }));
 
 router.get('/:id', ownership, asyncHandler(async (req, res) => {

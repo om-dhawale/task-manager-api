@@ -8,7 +8,7 @@ const {registerUserSchema, loginUserSchema} = require('../schemas/auth.schema');
 const asyncHandler = require('../middleware/asyncHandler');
 
 router.post('/signup',asyncHandler(async (req, res) => {
-    const result = userAuthSchema.safeParse(req.body);
+    const result = registerUserSchema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({ error: result.error.flatten() });
     }

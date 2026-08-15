@@ -23,11 +23,27 @@ router.post("/", asyncHandler(async (req, res) => {
 }));
 
 // READ ALL
-router.get("/", asyncHandler(async (req, res) => {
-  const projects = await prisma.project.findMany({
-    where: {userId: req.user.userId}
+router.get('/', asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
+
+  const where = { userId: req.user.userId };
+
+  const [projects, totalCount] = await Promise.all([
+    prisma.project.findMany({ where, skip, take: limit }),
+    prisma.project.count({ where }),
+  ]);
+
+  res.json({
+    data: projects,
+    pagination: {
+      page,
+      limit,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+    },
   });
-  res.json(projects);
 }));
 
 router.get('/:id', projectOwnership, asyncHandler(async (req, res) => {
