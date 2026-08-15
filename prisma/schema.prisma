@@ -14,30 +14,43 @@ datasource db {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
-  email           String    @unique
-  hashedPassword  String  
-  createdAt       DateTime  @default(now()) 
-  projects        Project[]
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
+  hashedPassword String
+  createdAt      DateTime  @default(now())
+  projects       Project[]
 }
 
 model Project {
-  id        Int       @id @default(autoincrement())
-  name      String    
-  createdAt DateTime  @default(now())
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
 
-  user      User      @relation(fields:[userId], references: [id], onDelete: Restrict)
-  userId    Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  userId Int
 
-  tasks     Task[]
+  tasks Task[]
 }
 
 model Task {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   title     String
-  completed Boolean @default(false)
-  createdAt DateTime  @default(now())
-  
-  project   Project @relation(fields:[projectId], references: [id], onDelete: Restrict)
-  projectId Int
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  projectId   Int
+  attachments Attachment[]
+}
+
+model Attachment {
+  id        Int      @id @default(autoincrement())
+  filename  String // original filename, e.g. "receipt.pdf"
+  path      String // where it's stored on disk, e.g. "uploads/1699999-receipt.pdf"
+  mimetype  String // e.g. "application/pdf"
+  size      Int // bytes
+  createdAt DateTime @default(now())
+
+  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId Int
 }
