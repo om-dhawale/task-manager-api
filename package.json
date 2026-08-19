@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node --watch server.js",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "dotenv -e .env.test -- jest"
   },
   "keywords": [],
   "author": "",
@@ -28,9 +29,12 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
+    "jest": "^30.4.2",
     "prettier": "^3.9.6",
-    "prisma": "^6.19.3"
+    "prisma": "^6.19.3",
+    "supertest": "^7.2.2"
   }
 }
